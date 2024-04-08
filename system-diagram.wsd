@@ -1,4 +1,4 @@
-@startuml SystemArchitectureDiagram
+@startuml System Architecture Diagram
 actor UserClient as "User Client"
 actor AdminClient as "Admin Client"
 component APIGateway as "API Gateway"
