@@ -1,0 +1,65 @@
+@startuml SystemArchitectureDiagram
+actor UserClient as "User Client"
+actor AdminClient as "Admin Client"
+component APIGateway as "API Gateway"
+component AuthenticationService as "Authentication Service"
+component AuthorizationService as "Authorization Service"
+component UploadDownloadService as "Upload/Download Service"
+component DirectoryManagementService as "Directory Management Service"
+database ConfigurationDB as "Configuration DB"
+database ObjectStorage as "Object Storage"
+database LogManagement as "Log Management"
+
+UserClient --> APIGateway : uses
+AdminClient --> APIGateway : uses
+
+APIGateway --> AuthenticationService : forwards
+APIGateway --> AuthorizationService : forwards
+APIGateway --> UploadDownloadService : forwards
+APIGateway --> DirectoryManagementService : forwards
+
+AuthenticationService --> ConfigurationDB : queries
+AuthorizationService --> ConfigurationDB : queries
+UploadDownloadService --> ObjectStorage : accesses
+DirectoryManagementService --> ConfigurationDB : modifies
+
+note right of AuthenticationService
+  Uses API Keys
+  Handles Key Generation
+end note
+
+note right of AuthorizationService
+  Verifies access rights
+  PUBLIC/PRIVATE Directories
+end note
+
+note right of UploadDownloadService
+  Handles file operations
+  Metadata management
+end note
+
+note right of DirectoryManagementService
+  CRUD operations on Directories
+end note
+
+note right of ObjectStorage
+  Stores files and metadata
+  Treats every upload as an object.
+  Supports multi-write scenarios.
+end note
+
+note right of ConfigurationDB
+  Stores user roles,
+  directory configs, API keys
+  Can be SQL, NoSQL, or XML-based.
+  Essential for key retention and
+  generation, and action logging.
+end note
+
+note right of LogManagement
+  Must implement OpenAPI solution
+  for standardized API documentation.
+  Soft deletes & prevents log overflow.
+end note
+
+@enduml
