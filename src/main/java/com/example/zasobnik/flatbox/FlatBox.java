@@ -1,9 +1,11 @@
-package com.example.zasobnik.storagebox;
+package com.example.zasobnik.flatbox;
 
 import com.example.zasobnik.common.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,4 +20,6 @@ import lombok.experimental.FieldDefaults;
 public class FlatBox extends BaseEntity {
     @Column(length = 255)
     String slug;
+    @Enumerated(EnumType.STRING)
+    private FlatBoxAccessType accessType;
 }
