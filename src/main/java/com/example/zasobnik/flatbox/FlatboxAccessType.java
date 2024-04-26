@@ -1,5 +1,5 @@
 package com.example.zasobnik.flatbox;
 
-public enum FlatBoxAccessType {
+public enum FlatboxAccessType {
     PUBLIC, PRIVATE
 }

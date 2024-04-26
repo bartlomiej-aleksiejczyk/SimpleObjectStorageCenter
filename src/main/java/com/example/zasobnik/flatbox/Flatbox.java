@@ -13,13 +13,13 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "flat_boxes")
+@Table(name = "flatboxes")
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FlatBox extends BaseEntity {
+public class Flatbox extends BaseEntity {
     @Column(length = 255)
     String slug;
     @Enumerated(EnumType.STRING)
-    private FlatBoxAccessType accessType;
+    private FlatboxAccessType accessType;
 }
