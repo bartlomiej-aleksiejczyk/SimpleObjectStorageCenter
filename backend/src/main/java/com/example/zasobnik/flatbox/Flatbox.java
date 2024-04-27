@@ -18,7 +18,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Flatbox extends BaseEntity {
-    @Column(length = 255)
+    @Column(length = 255, unique = true)
     String slug;
     @Enumerated(EnumType.STRING)
     private FlatboxAccessType accessType;
