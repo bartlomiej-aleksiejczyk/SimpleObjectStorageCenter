@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 public class FlatboxService {
 
     @Value("${STORAGE_DIRECTORY_PATH}")
-    private static String storageDirectoryPath;
+    private static String storageDirectoryPath = "./flatboxs/";
 
     private FlatboxRepository flatBoxRepository;
 
