@@ -23,7 +23,7 @@ import java.nio.file.Path;
 @Tag(name = "Flatbox Controller", description = "Endpoints connected to flatbox and its content manipulation.")
 @RequiredArgsConstructor
 public class FlatboxController {
-    private FlatboxService flatboxService;
+    private final FlatboxService flatboxService;
 
     @Operation(summary = "Create new flatbox object to aggregate files")
     @PostMapping("/create")

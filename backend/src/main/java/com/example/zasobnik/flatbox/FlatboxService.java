@@ -1,5 +1,6 @@
 package com.example.zasobnik.flatbox;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,12 +12,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Service
+@RequiredArgsConstructor
 public class FlatboxService {
 
     @Value("${STORAGE_DIRECTORY_PATH}")
     private static String storageDirectoryPath = "./flatboxs/";
 
-    private FlatboxRepository flatBoxRepository;
+    private final FlatboxRepository flatBoxRepository;
 
     @Transactional
     public Flatbox createFlatbox(String slug) {
