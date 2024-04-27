@@ -1,0 +1,49 @@
+version: "3.8"
+
+#WARNING THIS COMPOSE FILE IS SOLELY FOR LOCAL DEVELOPMENT PURPOSES
+#IT IS NOT SUITABLE FOR PRODUCTION NOR IT MUST NOT CONTAIN ANY SENSITIVE DATA UNDER ANY CIRCUMSTANCES
+services:
+  postgres:
+    image: "postgres:13"
+    environment:
+      - POSTGRES_USER=postgres_user
+      - POSTGRES_PASSWORD=postgres_password
+      - POSTGRES_DB=mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres_user -d mydatabase"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - webnet-zasobnik
+
+  springboot-server:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_SINGLE_LOGIN=admin
+      - SPRING_SINGLE_PASSWORD=password
+      - DB_USERNAME=postgres_user
+      - DB_PASSWORD=postgres_password
+      - SPRING_DB_PROD_URL=jdbc:postgresql://postgres:5432/mydatabase
+      - IMAGE_NAME=springboot-zasobnik
+      - TZ=Europe/Warsaw
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - webnet-zasobnik
+
+networks:
+  webnet-zasobnik:
+
+volumes:
+  postgres_data:
+    driver: local
