@@ -33,8 +33,9 @@ public class FlatboxController {
     }
 
     @Operation(summary = "Upload file to given flatbox")
-    @PostMapping("/upload/{flatboxId}")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, @PathVariable Long flatboxId) {
+    @PostMapping(value = "/upload/{flatboxId}", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<String> uploadFile(@RequestPart(name = "file") MultipartFile file,
+            @PathVariable Long flatboxId) {
         try {
             flatboxService.storeFile(file, flatboxId);
             String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -51,9 +52,9 @@ public class FlatboxController {
 
     @Operation(summary = "Download file from given flatbox")
     @GetMapping("/download/{flatboxId}/{filename:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long flatboxId, @PathVariable String filename) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable String flatboxSlug, @PathVariable String filename) {
         try {
-            Path filePath = flatboxService.loadFileAsResource(filename, flatboxId);
+            Path filePath = flatboxService.loadFileAsResource(filename, flatboxSlug);
             Resource resource = new UrlResource(filePath.toUri());
             if (resource.exists()) {
                 return ResponseEntity.ok()

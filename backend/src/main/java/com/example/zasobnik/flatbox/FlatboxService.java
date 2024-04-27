@@ -24,6 +24,7 @@ public class FlatboxService {
     public Flatbox createFlatbox(String slug) {
         Flatbox flatbox = new Flatbox();
         flatbox.setSlug(slug);
+        flatbox.setAccessType(FlatboxAccessType.PUBLIC);
         return flatBoxRepository.save(flatbox);
     }
 
@@ -34,7 +35,7 @@ public class FlatboxService {
         Files.copy(file.getInputStream(), targetLocation.resolve(file.getOriginalFilename()));
     }
 
-    public Path loadFileAsResource(String filename, Long flatBoxId) {
-        return Paths.get(storageDirectoryPath, flatBoxId.toString(), filename);
+    public Path loadFileAsResource(String filename, String flatboxSlug) {
+        return Paths.get(storageDirectoryPath, flatboxSlug, filename);
     }
 }
