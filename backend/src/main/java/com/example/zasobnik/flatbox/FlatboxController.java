@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.io.IOException;
@@ -35,12 +34,12 @@ public class FlatboxController {
     @Operation(summary = "Upload file to given flatbox")
     @PostMapping(value = "/upload/{flatboxId}", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<String> uploadFile(@RequestPart(name = "file") MultipartFile file,
-            @PathVariable Long flatboxId) {
+            @PathVariable String flatboxSlug) {
         try {
-            flatboxService.storeFile(file, flatboxId);
+            flatboxService.storeFile(file, flatboxSlug);
             String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/api/flatbox/download/")
-                    .path(flatboxId.toString())
+                    .path(flatboxSlug.toString())
                     .path("/")
                     .path(file.getOriginalFilename())
                     .toUriString();

@@ -29,8 +29,8 @@ public class FlatboxService {
     }
 
     @Transactional
-    public void storeFile(MultipartFile file, Long flatBoxId) throws IOException {
-        Path targetLocation = Paths.get(storageDirectoryPath, flatBoxId.toString());
+    public void storeFile(MultipartFile file, String flatboxSlug) throws IOException {
+        Path targetLocation = Paths.get(storageDirectoryPath, flatboxSlug.toString());
         Files.createDirectories(targetLocation);
         Files.copy(file.getInputStream(), targetLocation.resolve(file.getOriginalFilename()));
     }
