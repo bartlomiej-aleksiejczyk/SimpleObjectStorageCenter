@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -63,32 +64,30 @@ public class FlatboxController {
         }
     }
 
-    @Operation(summary = "Download file from given flatbox")
-    @GetMapping("/download/{flatboxSlug}/{filename:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String flatboxSlug, @PathVariable String filename) {
+    @GetMapping("/download/{filename}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filename,
+            @RequestParam(defaultValue = "true") boolean isPreviewEligible) {
+        Path file = Paths.get("path/to/file", filename);
+        Resource resource;
         try {
-            Path filePath = flatboxService.loadFileAsResource(filename, flatboxSlug);
-            Resource resource = new UrlResource(filePath.toUri());
-
-            if (!resource.exists()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            String mimeType = Files.probeContentType(filePath);
-            MediaType mediaType = mimeType != null ? MediaType.parseMediaType(mimeType)
-                    : MediaType.APPLICATION_OCTET_STREAM;
-
-            return ResponseEntity.ok()
-                    .contentType(mediaType)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                    .body(resource);
+            resource = new UrlResource(file.toUri());
         } catch (MalformedURLException e) {
-            log.error("Error constructing URL for the requested file: {}", filename, e);
-            return ResponseEntity.badRequest().build();
-        } catch (IOException e) {
-            log.error("File access error for file: {}", filename, e);
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.badRequest().body(null);
         }
+
+        if (!resource.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String contentType = DownloadFileUtils.determineContentType(file);
+        boolean isRenderable = isPreviewEligible && DownloadFileUtils.isRenderable(contentType);
+        String disposition = isRenderable ? "inline" : "attachment";
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + resource.getFilename() + "\"")
+                .header("X-Content-Type-Options", "nosniff")
+                .body(resource);
     }
 
     @Operation(summary = "Remove file from given flatbox")
