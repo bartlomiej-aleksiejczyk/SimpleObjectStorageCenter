@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -26,8 +27,8 @@ public class FlatboxController {
 
     @Operation(summary = "Create new flatbox object to aggregate files")
     @PostMapping("/create")
-    public ResponseEntity<?> createFlatbox(@RequestParam String slug) {
-        Flatbox flatbox = flatboxService.createFlatbox(slug);
+    public ResponseEntity<?> createFlatbox(@Valid @RequestBody FlatboxCreateDTO flatboxCreateDTO) {
+        Flatbox flatbox = flatboxService.createFlatbox(flatboxCreateDTO.slug());
         return new ResponseEntity<>(flatbox, HttpStatus.CREATED);
     }
 
