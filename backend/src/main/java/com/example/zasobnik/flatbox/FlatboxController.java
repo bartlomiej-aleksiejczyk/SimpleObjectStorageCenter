@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.zasobnik.flatbox.exceptions.FileListException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -102,7 +104,7 @@ public class FlatboxController {
 
     @Operation(summary = "List all files in the given flatbox")
     @GetMapping("/list/{flatboxSlug}")
-    public ResponseEntity<List<String>> listFiles(@PathVariable String flatboxSlug) {
+    public ResponseEntity<List<String>> listFiles(@PathVariable String flatboxSlug) throws FileListException {
         List<String> fileList = flatboxService.listFiles(flatboxSlug);
         return ResponseEntity.ok(fileList);
     }
