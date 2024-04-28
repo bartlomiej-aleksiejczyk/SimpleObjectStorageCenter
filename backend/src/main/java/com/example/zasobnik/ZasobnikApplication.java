@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+//TODO: Error messages are too informative
 @EnableJpaAuditing
 @SpringBootApplication
 public class ZasobnikApplication {

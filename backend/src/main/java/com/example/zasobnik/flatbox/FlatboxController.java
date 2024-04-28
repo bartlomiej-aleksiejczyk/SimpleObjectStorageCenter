@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,8 +22,6 @@ import jakarta.validation.Valid;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -66,11 +63,12 @@ public class FlatboxController {
 
     // TODO: Extract logic to service
     // TODO: Chech if it is worth to implement csp
-    @GetMapping("/download/{filename}")
+    @GetMapping("/download/{flatboxSlug}/{filename}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename,
+            @PathVariable String flatboxSlug,
             @RequestParam(defaultValue = "true") boolean isPreviewEligible) {
         try {
-            Resource resource = flatboxService.prepareFileResource(filename);
+            Resource resource = flatboxService.prepareFileResource(filename, flatboxSlug);
             String contentType = DownloadFileUtils.determineContentType(Paths.get(filename));
             String disposition = flatboxService.determineContentDisposition(contentType, isPreviewEligible);
 
