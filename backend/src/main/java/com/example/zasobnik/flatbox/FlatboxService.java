@@ -6,6 +6,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -26,16 +27,31 @@ public class FlatboxService {
     @Value("${STORAGE_DIRECTORY_PATH}")
     private static String storageDirectoryPath = "./flatboxs/";
 
+    private static final int MIN_FILENAME_LENGTH = 3;
     private static final int MAX_FILENAME_LENGTH = 200;
+
+    private static final int MIN_FLATBOX_LENGTH = 3;
+    private static final int MAX_FLATBOX_LENGTH = 200;
 
     private final FlatboxRepository flatBoxRepository;
 
     @Transactional
     public Flatbox createFlatbox(String slug) {
+        if (!isValidSlug(slug)) {
+            throw new IllegalArgumentException("Invalid slug provided.");
+        }
+
         Flatbox flatbox = new Flatbox();
         flatbox.setSlug(slug);
         flatbox.setAccessType(FlatboxAccessType.PUBLIC);
         return flatBoxRepository.save(flatbox);
+    }
+
+    private boolean isValidSlug(String slug) {
+        return slug != null
+                && slug.length() >= MIN_FLATBOX_LENGTH
+                && slug.length() <= MAX_FLATBOX_LENGTH
+                && slug.matches("^(?!xn--)[a-z0-9]+(-[a-z0-9]+)*$");
     }
 
     @Transactional
@@ -90,10 +106,17 @@ public class FlatboxService {
 
         String sanitizedBaseName = baseName.toLowerCase().replaceAll("[^a-z0-9\\-]", "-");
 
-        int maxBaseNameLength = MAX_FILENAME_LENGTH - (extension.isEmpty() ? 0 : extension.length() + 1); // +1 for the
-                                                                                                          // dot
-        if (sanitizedBaseName.length() > maxBaseNameLength) {
-            sanitizedBaseName = sanitizedBaseName.substring(0, maxBaseNameLength);
+        sanitizedBaseName = sanitizedBaseName.replaceAll("^xn--|^-+|-+$", "");
+
+        if (sanitizedBaseName.length() > MAX_FILENAME_LENGTH) {
+            sanitizedBaseName = sanitizedBaseName.substring(0, MAX_FILENAME_LENGTH).replaceAll("-+$", "");
+        }
+
+        while (sanitizedBaseName.length() < MIN_FILENAME_LENGTH) {
+            sanitizedBaseName += "-pad";
+            if (sanitizedBaseName.length() > MAX_FILENAME_LENGTH) {
+                sanitizedBaseName = sanitizedBaseName.substring(0, MAX_FILENAME_LENGTH).replaceAll("-+$", "");
+            }
         }
 
         return sanitizedBaseName + (extension.isEmpty() ? "" : "." + extension);
@@ -101,17 +124,20 @@ public class FlatboxService {
 
     private Path ensureUniqueFilename(Path directory, String sanitizedFilename) throws IOException {
         Path file = directory.resolve(sanitizedFilename);
-        int count = 0;
+        int count = 1;
         while (Files.exists(file)) {
-            count++;
             String baseName = FilenameUtils.getBaseName(sanitizedFilename);
             String extension = FilenameUtils.getExtension(sanitizedFilename);
-            int maxBaseLength = MAX_FILENAME_LENGTH - (extension.length() + String.valueOf(count).length() + 2);
-            if (baseName.length() > maxBaseLength) {
-                baseName = baseName.substring(0, maxBaseLength);
+            String newName = baseName + "-" + count;
+
+            if (newName.length() > MAX_FILENAME_LENGTH - (extension.isEmpty() ? 0 : extension.length() + 1)) {
+                newName = newName.substring(0, MAX_FILENAME_LENGTH - (extension.isEmpty() ? 0 : extension.length() + 1))
+                        .replaceAll("-+$", "");
             }
-            String newName = baseName + "-" + count + (extension.isEmpty() ? "" : "." + extension);
+
+            newName += (extension.isEmpty() ? "" : "." + extension);
             file = directory.resolve(newName);
+            count++;
         }
         return file;
     }
