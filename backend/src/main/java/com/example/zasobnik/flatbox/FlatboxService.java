@@ -10,6 +10,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.example.zasobnik.flatbox.exceptions.FileListException;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -84,7 +86,7 @@ public class FlatboxService {
     }
 
     // TODO: ADD pagination here
-    public List<String> listFiles(String flatboxSlug) {
+    public List<String> listFiles(String flatboxSlug) throws FileListException {
         Path directoryPath = Paths.get(storageDirectoryPath, flatboxSlug);
         try (Stream<Path> paths = Files.walk(directoryPath)) {
             return paths.filter(Files::isRegularFile)
@@ -92,7 +94,7 @@ public class FlatboxService {
                     .map(Path::toString)
                     .collect(Collectors.toList());
         } catch (IOException e) {
-            throw new RuntimeException("Failed to list files", e);
+            throw new FileListException("Failed to list files", e);
         }
     }
 
