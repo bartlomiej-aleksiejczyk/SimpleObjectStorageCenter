@@ -102,6 +102,7 @@ public class FlatboxController {
         }
     }
 
+    // TODO: Check if checked exception is needed here
     @Operation(summary = "List all files in the given flatbox")
     @GetMapping("/list/{flatboxSlug}")
     public ResponseEntity<List<String>> listFiles(@PathVariable String flatboxSlug) throws FileListException {
