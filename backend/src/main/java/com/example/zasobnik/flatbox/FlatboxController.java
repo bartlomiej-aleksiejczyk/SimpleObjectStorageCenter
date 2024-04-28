@@ -28,7 +28,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/V1/flatbox")
+@RequestMapping("/api/v1/flatbox")
 @Tag(name = "Flatbox Controller", description = "Endpoints connected to flatbox and its content manipulation.")
 @RequiredArgsConstructor
 public class FlatboxController {
