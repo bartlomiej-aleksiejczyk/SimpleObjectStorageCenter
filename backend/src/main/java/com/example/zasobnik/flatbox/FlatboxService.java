@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +15,7 @@ import com.example.zasobnik.flatbox.exceptions.FileListException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -82,6 +85,22 @@ public class FlatboxService {
         } else {
             throw new FileNotFoundException("File not found");
         }
+    }
+
+    public Resource prepareFileResource(String filename)
+            throws MalformedURLException, FileNotFoundException {
+        Path file = Paths.get("path/to/file", filename);
+        if (!Files.exists(file)) {
+            throw new FileNotFoundException("File not found");
+        }
+
+        Resource resource = new UrlResource(file.toUri());
+        return resource;
+    }
+
+    public String determineContentDisposition(String contentType, boolean isPreviewEligible) {
+        boolean isRenderable = isPreviewEligible && DownloadFileUtils.isRenderable(contentType);
+        return isRenderable ? "inline" : "attachment";
     }
 
     // TODO: ADD pagination here

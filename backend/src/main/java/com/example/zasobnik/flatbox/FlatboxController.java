@@ -64,30 +64,27 @@ public class FlatboxController {
         }
     }
 
+    // TODO: Extract logic to service
+    // TODO: Chech if it is worth to implement csp
     @GetMapping("/download/{filename}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename,
             @RequestParam(defaultValue = "true") boolean isPreviewEligible) {
-        Path file = Paths.get("path/to/file", filename);
-        Resource resource;
         try {
-            resource = new UrlResource(file.toUri());
+            Resource resource = flatboxService.prepareFileResource(filename);
+            String contentType = DownloadFileUtils.determineContentType(Paths.get(filename));
+            String disposition = flatboxService.determineContentDisposition(contentType, isPreviewEligible);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            disposition + "; filename=\"" + resource.getFilename() + "\"")
+                    .header("X-Content-Type-Options", "nosniff")
+                    .body(resource);
+        } catch (FileNotFoundException e) {
+            return ResponseEntity.notFound().build();
         } catch (MalformedURLException e) {
             return ResponseEntity.badRequest().body(null);
         }
-
-        if (!resource.exists()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        String contentType = DownloadFileUtils.determineContentType(file);
-        boolean isRenderable = isPreviewEligible && DownloadFileUtils.isRenderable(contentType);
-        String disposition = isRenderable ? "inline" : "attachment";
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + resource.getFilename() + "\"")
-                .header("X-Content-Type-Options", "nosniff")
-                .body(resource);
     }
 
     @Operation(summary = "Remove file from given flatbox")
