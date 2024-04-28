@@ -26,6 +26,8 @@ public class FlatboxService {
     @Value("${STORAGE_DIRECTORY_PATH}")
     private static String storageDirectoryPath = "./flatboxs/";
 
+    private static final int MAX_FILENAME_LENGTH = 200;
+
     private final FlatboxRepository flatBoxRepository;
 
     @Transactional
@@ -85,8 +87,16 @@ public class FlatboxService {
     private String sanitizeFilename(String filename) {
         String baseName = FilenameUtils.getBaseName(filename);
         String extension = FilenameUtils.getExtension(filename);
-        String sanitized = baseName.toLowerCase().replaceAll("[^a-z0-9\\-]", "-");
-        return sanitized + (extension.isEmpty() ? "" : "." + extension.toLowerCase());
+
+        String sanitizedBaseName = baseName.toLowerCase().replaceAll("[^a-z0-9\\-]", "-");
+
+        int maxBaseNameLength = MAX_FILENAME_LENGTH - (extension.isEmpty() ? 0 : extension.length() + 1); // +1 for the
+                                                                                                          // dot
+        if (sanitizedBaseName.length() > maxBaseNameLength) {
+            sanitizedBaseName = sanitizedBaseName.substring(0, maxBaseNameLength);
+        }
+
+        return sanitizedBaseName + (extension.isEmpty() ? "" : "." + extension);
     }
 
     private Path ensureUniqueFilename(Path directory, String sanitizedFilename) throws IOException {
@@ -94,11 +104,16 @@ public class FlatboxService {
         int count = 0;
         while (Files.exists(file)) {
             count++;
-            String newName = FilenameUtils.getBaseName(sanitizedFilename) + "-" + count +
-                    (FilenameUtils.getExtension(sanitizedFilename).isEmpty() ? ""
-                            : "." + FilenameUtils.getExtension(sanitizedFilename));
+            String baseName = FilenameUtils.getBaseName(sanitizedFilename);
+            String extension = FilenameUtils.getExtension(sanitizedFilename);
+            int maxBaseLength = MAX_FILENAME_LENGTH - (extension.length() + String.valueOf(count).length() + 2);
+            if (baseName.length() > maxBaseLength) {
+                baseName = baseName.substring(0, maxBaseLength);
+            }
+            String newName = baseName + "-" + count + (extension.isEmpty() ? "" : "." + extension);
             file = directory.resolve(newName);
         }
         return file;
     }
+
 }
