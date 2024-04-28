@@ -32,7 +32,7 @@ public class FlatboxController {
     }
 
     @Operation(summary = "Upload file to given flatbox")
-    @PostMapping(value = "/upload/{flatboxId}", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @PostMapping(value = "/upload/{flatboxSlug}", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<String> uploadFile(@RequestPart(name = "file") MultipartFile file,
             @PathVariable String flatboxSlug) {
         try {
@@ -50,7 +50,7 @@ public class FlatboxController {
     }
 
     @Operation(summary = "Download file from given flatbox")
-    @GetMapping("/download/{flatboxId}/{filename:.+}")
+    @GetMapping("/download/{flatboxSlug}/{filename:.+}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String flatboxSlug, @PathVariable String filename) {
         try {
             Path filePath = flatboxService.loadFileAsResource(filename, flatboxSlug);
