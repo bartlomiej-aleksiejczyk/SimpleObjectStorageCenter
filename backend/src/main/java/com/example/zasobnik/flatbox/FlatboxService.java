@@ -125,14 +125,14 @@ public class FlatboxService {
 
         String sanitizedBaseName = baseName.toLowerCase().replaceAll("[^a-z0-9\\.\\-]", "-");
 
-        sanitizedBaseName = sanitizedBaseName.replaceAll("^xn--|^-+|-+$|\\.+", "-");
-
-        while (sanitizedBaseName.contains("..")) {
-            sanitizedBaseName = sanitizedBaseName.replace("..", ".");
-        }
+        sanitizedBaseName = sanitizedBaseName.replaceAll("\\.{2,}", ".")
+                .replaceAll("-{2,}", "-")
+                .replaceAll("^-+|-+$", "")
+                .replaceAll("^\\.+|\\.+$", "");
 
         if (sanitizedBaseName.length() > MAX_FILENAME_LENGTH) {
-            sanitizedBaseName = sanitizedBaseName.substring(0, MAX_FILENAME_LENGTH).replaceAll("-+$|\\.+$", "");
+            sanitizedBaseName = sanitizedBaseName.substring(0, MAX_FILENAME_LENGTH);
+            sanitizedBaseName = sanitizedBaseName.replaceAll("-+$|\\.+$", "");
         }
 
         while (sanitizedBaseName.length() < MIN_FILENAME_LENGTH) {
@@ -143,7 +143,7 @@ public class FlatboxService {
         }
 
         if (sanitizedBaseName.matches("(\\d+\\.){3}\\d+")) {
-            sanitizedBaseName = sanitizedBaseName.replace(".", "-");
+            sanitizedBaseName = sanitizedBaseName.replace('.', '-');
         }
 
         return sanitizedBaseName + (extension.isEmpty() ? "" : "." + extension);
@@ -154,10 +154,10 @@ public class FlatboxService {
         int count = 1;
         while (Files.exists(file)) {
             String baseName = FilenameUtils.getBaseName(sanitizedFilename);
-            String extension = getFullExtension(sanitizedFilename); // Use a custom method to handle compound extensions
+            String extension = getFullExtension(sanitizedFilename);
 
             String newName = baseName + "-" + count;
-            int extensionLength = extension.isEmpty() ? 0 : extension.length() + 1; // +1 for the dot
+            int extensionLength = extension.isEmpty() ? 0 : extension.length() + 1;
             if (newName.length() > MAX_FILENAME_LENGTH - extensionLength) {
                 newName = newName.substring(0, MAX_FILENAME_LENGTH - extensionLength).replaceAll("-+$", "");
             }
