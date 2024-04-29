@@ -4,3 +4,5 @@
 - Make api restful
 - Unique slug
 - Less error details in endpoints
+- Auth by api keys and by user
+- api keys generation
