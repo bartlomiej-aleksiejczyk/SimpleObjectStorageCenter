@@ -26,13 +26,13 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/flatbox")
-@Tag(name = "Flatbox Controller", description = "Endpoints connected to flatbox and its content manipulation.")
+@RequestMapping("/api/client/v1/flatbox")
+@Tag(name = "Flatbox Controller", description = "Endpoints connected to flatbox and its content manipulation. Intended for server-to-browser communication.")
 @RequiredArgsConstructor
-public class FlatboxController {
+public class FlatboxClientController {
     private final FlatboxService flatboxService;
 
-    static final Logger log = LoggerFactory.getLogger(FlatboxController.class);
+    static final Logger log = LoggerFactory.getLogger(FlatboxClientController.class);
 
     @Operation(summary = "Create new flatbox object to aggregate files")
     @PostMapping("/create")
