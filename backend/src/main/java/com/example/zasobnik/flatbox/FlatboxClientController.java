@@ -86,10 +86,11 @@ public class FlatboxClientController {
     }
 
     @Operation(summary = "Remove file from given flatbox")
-    @DeleteMapping("/remove/{flatboxSlug}/{filename:.+}")
-    public ResponseEntity<?> removeFile(@PathVariable String flatboxSlug, @PathVariable String filename) {
+    @DeleteMapping("/remove/{flatboxType}/{flatboxSlug}/{filename:.+}")
+    public ResponseEntity<?> removeFile(@PathVariable String flatboxType, @PathVariable String flatboxSlug,
+            @PathVariable String filename) {
         try {
-            flatboxService.removeFile(filename, flatboxSlug);
+            flatboxService.removeFile(flatboxType, filename, flatboxSlug);
             return ResponseEntity.ok().body("File removed successfully");
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to remove file");

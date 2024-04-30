@@ -94,10 +94,19 @@ public class FlatboxService {
         return fileDownloadUri;
     }
 
-    // TODO: Reorganize endpoints it is cruicial
     @Transactional
-    public void removeFile(String filename, String flatboxSlug) throws IOException {
-        Path filePath = Paths.get(storageDirectoryPath, flatboxSlug, filename);
+    public void removeFile(String flatboxTypeString, String filename, String flatboxSlug) throws IOException {
+        FlatboxAccessType flatboxType;
+        try {
+            flatboxType = FlatboxAccessType.valueOf(flatboxTypeString.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid flatbox type provided.");
+        }
+
+        String directoryPath = (flatboxType == FlatboxAccessType.PUBLIC) ? PUBLIC_DIRECTORY_PATH
+                : PRIVATE_DIRECTORY_PATH;
+
+        Path filePath = Paths.get(directoryPath, flatboxSlug, filename);
         if (Files.exists(filePath)) {
             Files.delete(filePath);
         } else {
