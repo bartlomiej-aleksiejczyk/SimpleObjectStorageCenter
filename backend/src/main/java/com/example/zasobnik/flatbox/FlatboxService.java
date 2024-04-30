@@ -29,7 +29,10 @@ import java.util.stream.Stream;
 public class FlatboxService {
 
     @Value("${STORAGE_DIRECTORY_PATH}")
-    private static String storageDirectoryPath = "./flatboxs/";
+    private static String storageDirectoryPath = "./flatboxes/";
+
+    private final String PUBLIC_DIRECTORY_PATH = "public";
+    private final String PRIVATE_DIRECTORY_PATH = "private";
 
     private static final int MIN_FILENAME_LENGTH = 3;
     private static final int MAX_FILENAME_LENGTH = 200;
@@ -40,7 +43,10 @@ public class FlatboxService {
     private final FlatboxRepository flatBoxRepository;
 
     @Transactional
-    public Flatbox createFlatbox(String slug) {
+    public Flatbox createFlatbox(FlatboxCreateDTO flatboxCreateDTO) {
+        String slug = flatboxCreateDTO.slug();
+        boolean isPublic = flatboxCreateDTO.isPublic();
+
         if (!isValidSlug(slug)) {
             throw new IllegalArgumentException("Invalid slug provided.");
         }
@@ -50,7 +56,7 @@ public class FlatboxService {
 
         Flatbox flatbox = new Flatbox();
         flatbox.setSlug(slug);
-        flatbox.setAccessType(FlatboxAccessType.PUBLIC);
+        flatbox.setAccessType(isPublic ? FlatboxAccessType.PUBLIC : FlatboxAccessType.PRIVATE);
         return flatBoxRepository.save(flatbox);
     }
 
@@ -63,15 +69,23 @@ public class FlatboxService {
 
     @Transactional
     public String storeFile(MultipartFile file, String flatboxSlug) throws IOException {
+        Flatbox flatbox = flatBoxRepository.findBySlug(flatboxSlug)
+                .orElseThrow(() -> new IllegalArgumentException("Flatbox with the given slug does not exist."));
+
+        String accessDirectoryPath = flatbox.getAccessType() == FlatboxAccessType.PUBLIC ? PUBLIC_DIRECTORY_PATH
+                : PRIVATE_DIRECTORY_PATH;
+
         String originalFilename = file.getOriginalFilename();
         String sanitizedFilename = sanitizeFilename(originalFilename);
-        Path targetLocation = Paths.get(storageDirectoryPath, flatboxSlug);
+        Path targetLocation = Paths.get(storageDirectoryPath, accessDirectoryPath, flatboxSlug);
         Files.createDirectories(targetLocation);
         Path filePath = ensureUniqueFilename(targetLocation, sanitizedFilename);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
         String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/v1/flatbox/download/")
+                .path("/api/")
+                .path(accessDirectoryPath)
+                .path("/v1/flatbox/download/")
                 .path(flatboxSlug)
                 .path("/")
                 .path(filePath.getFileName().toString())
@@ -80,6 +94,7 @@ public class FlatboxService {
         return fileDownloadUri;
     }
 
+    // TODO: Reorganize endpoints it is cruicial
     @Transactional
     public void removeFile(String filename, String flatboxSlug) throws IOException {
         Path filePath = Paths.get(storageDirectoryPath, flatboxSlug, filename);
