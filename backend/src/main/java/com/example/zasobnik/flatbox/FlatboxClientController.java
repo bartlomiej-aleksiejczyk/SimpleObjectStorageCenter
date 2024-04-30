@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Paths;
 import java.util.List;
 
+//TODO: Add edit endpoitn (shorthnad for remove and add)
 @RestController
 @RequestMapping("/api/client/v1/flatbox")
 @Tag(name = "Flatbox Controller", description = "Endpoints connected to flatbox and its content manipulation. Intended for server-to-browser communication.")
