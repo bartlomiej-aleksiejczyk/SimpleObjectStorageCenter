@@ -37,7 +37,7 @@ public class FlatboxClientController {
     @Operation(summary = "Create new flatbox object to aggregate files")
     @PostMapping("/create")
     public ResponseEntity<?> createFlatbox(@Valid @RequestBody FlatboxCreateDTO flatboxCreateDTO) {
-        Flatbox flatbox = flatboxService.createFlatbox(flatboxCreateDTO.slug());
+        Flatbox flatbox = flatboxService.createFlatbox(flatboxCreateDTO);
         return new ResponseEntity<>(flatbox, HttpStatus.CREATED);
     }
 
