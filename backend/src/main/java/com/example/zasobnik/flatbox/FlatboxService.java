@@ -31,8 +31,8 @@ public class FlatboxService {
     @Value("${STORAGE_DIRECTORY_PATH}")
     private static String storageDirectoryPath = "./flatboxes/";
 
-    private final String PUBLIC_DIRECTORY_PATH = "public";
-    private final String PRIVATE_DIRECTORY_PATH = "private";
+    private static final String PUBLIC_DIRECTORY_PATH = "public";
+    private static final String PRIVATE_DIRECTORY_PATH = "private";
 
     private static final int MIN_FILENAME_LENGTH = 3;
     private static final int MAX_FILENAME_LENGTH = 200;
