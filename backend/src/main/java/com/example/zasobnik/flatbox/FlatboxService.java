@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.zasobnik.flatbox.exceptions.FileListException;
+import com.example.zasobnik.flatbox.exceptions.ZipCreationRuntimeException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,13 +24,15 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Service
 @RequiredArgsConstructor
 public class FlatboxService {
 
     @Value("${STORAGE_DIRECTORY_PATH}")
-    private static String storageDirectoryPath = "./flatboxes/";
+    private static final String STORAGE_DIRECTORY_PATH = "./flatboxes/";
 
     private static final String PUBLIC_DIRECTORY_PATH = "public";
     private static final String PRIVATE_DIRECTORY_PATH = "private";
@@ -77,7 +80,7 @@ public class FlatboxService {
 
         String originalFilename = file.getOriginalFilename();
         String sanitizedFilename = sanitizeFilename(originalFilename);
-        Path targetLocation = Paths.get(storageDirectoryPath, accessDirectoryPath, flatboxSlug);
+        Path targetLocation = Paths.get(STORAGE_DIRECTORY_PATH, accessDirectoryPath, flatboxSlug);
         Files.createDirectories(targetLocation);
         Path filePath = ensureUniqueFilename(targetLocation, sanitizedFilename);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -116,7 +119,7 @@ public class FlatboxService {
 
     public Resource prepareFileResource(String filename, String flatboxSlug)
             throws MalformedURLException, FileNotFoundException {
-        Path file = Paths.get(storageDirectoryPath, flatboxSlug, filename);
+        Path file = Paths.get(STORAGE_DIRECTORY_PATH, flatboxSlug, filename);
         if (!Files.exists(file)) {
             throw new FileNotFoundException("File not found");
         }
@@ -132,7 +135,7 @@ public class FlatboxService {
 
     // TODO: ADD pagination here
     public List<String> listFiles(String flatboxSlug) throws FileListException {
-        Path directoryPath = Paths.get(storageDirectoryPath, flatboxSlug);
+        Path directoryPath = Paths.get(STORAGE_DIRECTORY_PATH, flatboxSlug);
         try (Stream<Path> paths = Files.walk(directoryPath)) {
             return paths.filter(Files::isRegularFile)
                     .map(Path::getFileName)
@@ -140,6 +143,24 @@ public class FlatboxService {
                     .collect(Collectors.toList());
         } catch (IOException e) {
             throw new FileListException("Failed to list files", e);
+        }
+    }
+
+    public void zipDirectory(String flatboxSlug, ZipOutputStream zos) throws IOException {
+        Path sourceDirPath = Paths.get(STORAGE_DIRECTORY_PATH, flatboxSlug);
+
+        try (Stream<Path> stream = Files.walk(sourceDirPath)) {
+            stream.filter(Files::isRegularFile)
+                    .forEach(path -> {
+                        try {
+                            ZipEntry zipEntry = new ZipEntry(sourceDirPath.relativize(path).toString());
+                            zos.putNextEntry(zipEntry);
+                            Files.copy(path, zos);
+                            zos.closeEntry();
+                        } catch (IOException e) {
+                            throw new ZipCreationRuntimeException("Failed to add file to ZIP: " + e.getMessage(), e);
+                        }
+                    });
         }
     }
 

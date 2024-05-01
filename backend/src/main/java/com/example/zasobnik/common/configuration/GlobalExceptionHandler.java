@@ -11,6 +11,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.example.zasobnik.flatbox.exceptions.ZipCreationRuntimeException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -38,6 +40,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleGenericException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("An unexpected error occurred: " + ex.getMessage());
+    }
+
+    @ExceptionHandler(ZipCreationRuntimeException.class)
+    public ResponseEntity<String> handleZipCreationException(ZipCreationRuntimeException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Failed to create ZIP file: " + e.getMessage());
     }
 
 }

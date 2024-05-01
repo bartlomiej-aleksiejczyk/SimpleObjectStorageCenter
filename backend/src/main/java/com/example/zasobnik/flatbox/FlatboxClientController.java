@@ -17,13 +17,16 @@ import com.example.zasobnik.flatbox.exceptions.FileListException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
+import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.zip.ZipOutputStream;
 
 //TODO: Add edit endpoitn (shorthnad for remove and add)
 @RestController
@@ -104,6 +107,21 @@ public class FlatboxClientController {
     public ResponseEntity<List<String>> listFiles(@PathVariable String flatboxSlug) throws FileListException {
         List<String> fileList = flatboxService.listFiles(flatboxSlug);
         return ResponseEntity.ok(fileList);
+    }
+
+    @Operation(summary = "Download given directory as zip by streaming")
+    @GetMapping("/zip-and-download/{flatboxSlug}")
+    public void zipAndDownload(@PathVariable String flatboxSlug, HttpServletResponse response) {
+
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + flatboxSlug + ".zip\"");
+
+        try (ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(response.getOutputStream()))) {
+            flatboxService.zipDirectory(flatboxSlug, zos);
+            zos.finish();
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
     }
 
     @ExceptionHandler(IOException.class)
