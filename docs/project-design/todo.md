@@ -6,5 +6,6 @@
 - Less error details in endpoints
 - Auth by api keys and by user
 - api keys generation
+- presigned urls generation
 ---
 - RELY ON NGNIX IN FILE SERVING
