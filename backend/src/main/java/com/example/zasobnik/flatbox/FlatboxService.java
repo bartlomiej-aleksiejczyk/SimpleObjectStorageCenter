@@ -133,16 +133,21 @@ public class FlatboxService {
         return isRenderable ? "inline" : "attachment";
     }
 
-    // TODO: ADD pagination here
-    public List<String> listFiles(String flatboxSlug) throws FileListException {
+    public Page<String> listFiles(String flatboxSlug, Pageable pageable) throws FlatboxListException {
         Path directoryPath = Paths.get(STORAGE_DIRECTORY_PATH, flatboxSlug);
         try (Stream<Path> paths = Files.walk(directoryPath)) {
-            return paths.filter(Files::isRegularFile)
+            List<String> allFiles = paths.filter(Files::isRegularFile)
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .collect(Collectors.toList());
+
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), allFiles.size());
+            List<String> pageContent = allFiles.subList(start, end);
+
+            return new PageImpl<>(pageContent, pageable, allFiles.size());
         } catch (IOException e) {
-            throw new FileListException("Failed to list files", e);
+            throw new FlatboxListException("Failed to list files", e);
         }
     }
 

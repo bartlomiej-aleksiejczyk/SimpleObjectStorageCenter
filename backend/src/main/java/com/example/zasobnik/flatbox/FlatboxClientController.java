@@ -102,11 +102,11 @@ public class FlatboxClientController {
     }
 
     // TODO: Check if checked exception is needed here
-    @Operation(summary = "List all files in the given flatbox")
     @GetMapping("/list/{flatboxSlug}")
-    public ResponseEntity<List<String>> listFiles(@PathVariable String flatboxSlug) throws FileListException {
-        List<String> fileList = flatboxService.listFiles(flatboxSlug);
-        return ResponseEntity.ok(fileList);
+    public ResponseEntity<Page<String>> listFiles(@PathVariable String flatboxSlug,
+            @PageableDefault(size = 10, maxPageSize = 1000) Pageable pageable) {
+        Page<String> filePage = flatboxService.listFiles(flatboxSuch, pageable);
+        return ResponseEntity.ok(filePage);
     }
 
     @Operation(summary = "Download given directory as zip by streaming")
@@ -133,6 +133,11 @@ public class FlatboxClientController {
     @ExceptionHandler(FileNotFoundException.class)
     public ResponseEntity<Object> handleFileNotFoundException(FileNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("File not found: " + ex.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<String> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        return new ResponseEntity<>("Invalid pagination parameters: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
