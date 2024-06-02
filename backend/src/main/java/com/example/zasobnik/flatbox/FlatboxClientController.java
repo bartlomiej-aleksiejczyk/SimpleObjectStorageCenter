@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.zasobnik.flatbox.exceptions.FileListException;
@@ -102,11 +103,11 @@ public class FlatboxClientController {
     }
 
     // TODO: Check if checked exception is needed here
+    @Operation(summary = "List all files in the given flatbox")
     @GetMapping("/list/{flatboxSlug}")
-    public ResponseEntity<Page<String>> listFiles(@PathVariable String flatboxSlug,
-            @PageableDefault(size = 10, maxPageSize = 1000) Pageable pageable) {
-        Page<String> filePage = flatboxService.listFiles(flatboxSuch, pageable);
-        return ResponseEntity.ok(filePage);
+    public ResponseEntity<List<String>> listFiles(@PathVariable String flatboxSlug) throws FileListException {
+        List<String> fileList = flatboxService.listFiles(flatboxSlug);
+        return ResponseEntity.ok(fileList);
     }
 
     @Operation(summary = "Download given directory as zip by streaming")

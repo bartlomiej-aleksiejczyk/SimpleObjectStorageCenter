@@ -3,9 +3,12 @@ package com.example.zasobnik.flatbox;
 import lombok.RequiredArgsConstructor;
 
 import org.apache.commons.io.FilenameUtils;
+import org.springdoc.core.converters.models.Pageable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -133,21 +136,16 @@ public class FlatboxService {
         return isRenderable ? "inline" : "attachment";
     }
 
-    public Page<String> listFiles(String flatboxSlug, Pageable pageable) throws FlatboxListException {
+    // TODO: ADD soem form of pagination that repalce Files.walk
+    public List<String> listFiles(String flatboxSlug) throws FileListException {
         Path directoryPath = Paths.get(STORAGE_DIRECTORY_PATH, flatboxSlug);
         try (Stream<Path> paths = Files.walk(directoryPath)) {
-            List<String> allFiles = paths.filter(Files::isRegularFile)
+            return paths.filter(Files::isRegularFile)
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .collect(Collectors.toList());
-
-            int start = (int) pageable.getOffset();
-            int end = Math.min((start + pageable.getPageSize()), allFiles.size());
-            List<String> pageContent = allFiles.subList(start, end);
-
-            return new PageImpl<>(pageContent, pageable, allFiles.size());
         } catch (IOException e) {
-            throw new FlatboxListException("Failed to list files", e);
+            throw new FileListException("Failed to list files", e);
         }
     }
 
