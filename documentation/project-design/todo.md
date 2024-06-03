@@ -1,6 +1,11 @@
 # TODO list
 
-- Endpoint List all flatboxes
+- user authorization and authentication
+- role based permissions 
+- permissions to flatbox
+- link based access
+---
+- Endpoint List all flatboxes for certain user according to permissions 
 - Make api restful
 - Unique slug
 - Less error details in endpoints
