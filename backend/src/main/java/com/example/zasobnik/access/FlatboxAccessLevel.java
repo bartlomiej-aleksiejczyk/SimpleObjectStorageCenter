@@ -1,6 +1,6 @@
 package com.example.zasobnik.access;
 
-public enum AccessLevel {
+public enum FlatboxAccessLevel {
     /**
      * Allows the user to read content from a specified flatbox.
      */

@@ -3,7 +3,7 @@ package com.example.zasobnik.access;
 import com.example.zasobnik.user.User;
 import com.example.zasobnik.flatbox.Flatbox;
 import com.example.zasobnik.common.BaseEntity;
-import com.example.zasobnik.access.AccessLevel;
+import com.example.zasobnik.access.FlatboxAccessLevel;
 
 import jakarta.persistence.*;
 
@@ -30,6 +30,6 @@ public class FlatboxAccessPermission extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    AccessLevel accessLevel;
+    FlatboxAccessLevel accessLevel;
 
 }
