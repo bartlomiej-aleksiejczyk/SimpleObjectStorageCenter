@@ -1,3 +1,5 @@
+package com.example.zasobnik.user;
+
 public enum UserRole {
-    ADMIN, USER, GUEST
+    ROLE_ADMINISTRATOR, ROLE_INSPECTOR, ROLE_MODERATOR, ROLE_SUPER_EDITOR
 }
