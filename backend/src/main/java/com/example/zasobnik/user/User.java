@@ -1,6 +1,7 @@
 package com.example.zasobnik.user;
 
 import com.example.zasobnik.common.BaseEntity;
+import com.example.zasobnik.access.FlatboxAccessPermission;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -20,4 +21,6 @@ public class User extends BaseEntity {
     String username;
     String password;
     String roles;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<FlatboxAccessPermission> flatboxPermissions;
 }
