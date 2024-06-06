@@ -17,5 +17,9 @@ public enum UserRole {
     /**
      * Enables the user to create flatboxes.
      */
-    ROLE_SUPER_EDITOR
+    ROLE_SUPER_EDITOR,
+    /**
+     * No global-level permissions.
+     */
+    ROLE_USER
 }
