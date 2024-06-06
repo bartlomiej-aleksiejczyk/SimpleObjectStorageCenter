@@ -1,7 +1,6 @@
 package com.example.zasobnik.user;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,9 +8,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
-
-import com.example.zasobnik.user.User;
-import com.example.zasobnik.user.UserRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +23,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 user.getUsername(),
                 user.getPassword(),
-                Arrays.stream(user.getRoles().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList()));
+                Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())));
     }
 
 }

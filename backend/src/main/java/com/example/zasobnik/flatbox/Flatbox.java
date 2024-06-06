@@ -3,6 +3,7 @@ package com.example.zasobnik.flatbox;
 import com.example.zasobnik.common.BaseEntity;
 import com.example.zasobnik.access.FlatboxAccessPermission;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -27,5 +28,5 @@ public class Flatbox extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private FlatboxAccessType accessType;
     @OneToMany(mappedBy = "flatbox", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<FlatboxVeryAccessPermission> userPermissions;
+    Set<FlatboxAccessPermission> userPermissions;
 }

@@ -4,9 +4,13 @@ import com.example.zasobnik.common.BaseEntity;
 import com.example.zasobnik.access.FlatboxAccessPermission;
 import com.example.zasobnik.user.UserRole;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Table;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

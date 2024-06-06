@@ -5,8 +5,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 
-import com.example.zasobnik.user.UserService;
-
 @Component
 @RequiredArgsConstructor
 public class UserInitializer implements CommandLineRunner {

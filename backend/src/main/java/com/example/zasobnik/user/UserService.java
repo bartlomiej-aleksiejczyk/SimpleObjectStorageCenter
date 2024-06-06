@@ -4,8 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 
-import com.example.zasobnik.user.UserRepository;
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -19,7 +17,7 @@ public class UserService {
             User user = new User();
             user.setUsername(username);
             user.setPassword(encodedPassword);
-            user.setRoles("ROLE_ADMINISTRATOR");
+            user.setRole(UserRole.ROLE_ADMINISTRATOR);
 
             userRepository.save(user);
         }
