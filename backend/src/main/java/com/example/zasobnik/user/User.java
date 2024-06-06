@@ -26,6 +26,7 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 public class User extends BaseEntity {
+    @Column(unique = true)
     String username;
     String password;
     @Enumerated(EnumType.STRING)

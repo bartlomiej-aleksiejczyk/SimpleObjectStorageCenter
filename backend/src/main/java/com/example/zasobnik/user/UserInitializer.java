@@ -18,6 +18,6 @@ public class UserInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        userService.createUser(login, rawPassword);
+        userService.createAdmin(login, rawPassword);
     }
 }
