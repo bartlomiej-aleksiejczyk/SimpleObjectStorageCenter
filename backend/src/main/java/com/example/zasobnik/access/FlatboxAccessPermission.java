@@ -3,10 +3,8 @@ package com.example.zasobnik.access;
 import com.example.zasobnik.user.User;
 import com.example.zasobnik.flatbox.Flatbox;
 import com.example.zasobnik.common.BaseEntity;
-import com.example.zasobnik.access.FlatboxAccessLevel;
 
 import jakarta.persistence.*;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +12,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "flatbox_access_permissions")
+@Table(name = "flatbox_access_permissions", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "user_id", "flatbox_id" }, name = "UK_user_flatbox")
+})
 @Getter
 @Setter
 @NoArgsConstructor
