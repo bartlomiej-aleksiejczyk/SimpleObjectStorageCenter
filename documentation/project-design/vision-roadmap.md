@@ -33,6 +33,9 @@
    - Use API keys based, where each client has their key.
    - Implement basic key retention and generation.
    - Use a better method than basic auth with API keys in request headers.
+   - Separate endpoints for browser client/admin panel and server.
+   - Admin panel will use User as auth object and Server endpoints wolill use API key as auth object
+   - API key would use AccessKey as username and SecretKey as password.
 
 5. **Technical Requirements and Data Management**
 
